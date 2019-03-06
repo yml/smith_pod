@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' show parse;
+import 'package:html/dom.dart' as dom;
 
 void main() => runApp(MyApp());
 
@@ -28,16 +31,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -45,21 +38,42 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  
+  String podTitle ;
+  String podDescription ;
+  String podImageURL ;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  _getPhotoOfTheDay() {
+    const podURL =
+        'https://www.smithsonianmag.com/photocontest/photo-of-the-day/';
+    String title;
+    String description;
+    String imageURL;
+    var response = http.get(podURL);
+    response.then((resp) {
+      var document = parse(resp.body);
+      const titleSelector =
+          'body > div.container > div.photo-contest-content.photo-contest-detail-content.photo-contest-detail-wrapper > div.photo-contest-detail-title';
+      var elm = document.querySelector(titleSelector);
+      title = elm.text;
+      const descriptionSelector =
+          'body > div.container > div.photo-contest-content.photo-contest-detail-content.photo-contest-detail-wrapper > p.photo-contest-detail-caption';
+      elm = document.querySelector(descriptionSelector);
+      description = elm.text;
+      const imageUrlSelector =
+          '#hero > div.photo-contest-detail-image > div > div.slideshow-slides > div > img';
+      elm = document.querySelector(imageUrlSelector);
+      imageURL = elm.attributes['src'];
+    }).catchError((e) {
+      throw "Could not fetch photo of the day info from smithsonianmag.com";
+    }).whenComplete((){
+      setState(() {
+        podTitle = title;
+        podDescription = description;
+        podImageURL =imageURL;
+      });
     });
   }
-
-  @override
-  Widget build(BuildContext context) {
     _launchUrl(String url) async {
       if (await canLaunch(url)) {
         await launch(url);
@@ -67,44 +81,24 @@ class _MyHomePageState extends State<MyHomePage> {
         throw 'Could not launch $url';
       }
     }
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+
+  @override
+  Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
+        child: podTitle != null ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              podTitle,
+              style: Theme.of(context).textTheme.display1,
             ),
             Text(
-              'Photo by: Yuliana Yaman',
-              style: Theme.of(context).textTheme.display1,
+              podDescription,
             ),
             GestureDetector(
               onTap: () => _launchUrl('https://smithsonianmag.com'),
@@ -116,14 +110,14 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Image.network(
-                "https://thumbs-prod.si-cdn.com/SWsFYHhAhP1rMAUZa3oYGZazQBk=/fit-in/1072x0/filters:focal(152x196:153x197)/https://contest-public-media.si-cdn.com/photos/6ffcef80-8915-47a0-9679-6294b6a6a406-WEB.jpg")
+                podImageURL)
           ],
-        ),
+        ) : Text("No photo of the day..."),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _getPhotoOfTheDay,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.refresh),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
