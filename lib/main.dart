@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as dom;
+//import 'package:html/dom.dart' as dom;
 
 void main() => runApp(MyApp());
 
@@ -29,26 +29,24 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+class PodWidget extends StatefulWidget {
+  PodWidget({Key key, this.url}) : super(key: key);
+  final String url;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _PodWidgetState createState() => _PodWidgetState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _PodWidgetState extends State<PodWidget> {
   String podTitle;
   String podDescription;
   String podImageURL;
 
   _getPhotoOfTheDay() {
-    const podURL =
-        'https://www.smithsonianmag.com/photocontest/photo-of-the-day/';
     String title;
     String description;
     String imageURL;
-    var response = http.get(podURL);
+    var response = http.get(this.widget.url);
     response.then((resp) {
       var document = parse(resp.body);
       const titleSelector =
@@ -82,6 +80,50 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+
+  @override
+  Widget build(BuildContext context) {
+    if (podTitle != null) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            podTitle,
+            style: Theme.of(context).textTheme.display1,
+          ),
+          Text(
+            podDescription,
+          ),
+          GestureDetector(
+            onTap: () => _launchUrl(this.widget.url),
+            child: RichText(
+              text: new TextSpan(
+                text: 'view on smithsonianmag.com',
+                style: new TextStyle(color: Colors.blue),
+              ),
+            ),
+          ),
+          Image.network(podImageURL)
+        ],
+      );
+    } else {
+      return FloatingActionButton(
+        onPressed: _getPhotoOfTheDay,
+        tooltip: 'Increment',
+        child: Icon(Icons.refresh),
+      );
+    }
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+  final String title;
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,36 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: podTitle != null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    podTitle,
-                    style: Theme.of(context).textTheme.display1,
-                  ),
-                  Text(
-                    podDescription,
-                  ),
-                  GestureDetector(
-                    onTap: () => _launchUrl('https://smithsonianmag.com'),
-                    child: RichText(
-                      text: new TextSpan(
-                        text: 'view on smithsonianmag.com',
-                        style: new TextStyle(color: Colors.blue),
-                      ),
-                    ),
-                  ),
-                  Image.network(podImageURL)
-                ],
-              )
-            : Text("No photo of the day..."),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _getPhotoOfTheDay,
-        tooltip: 'Increment',
-        child: Icon(Icons.refresh),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+          child: PodWidget(
+              url:
+                  'https://www.smithsonianmag.com/photocontest/photo-of-the-day/')),
     );
   }
 }
