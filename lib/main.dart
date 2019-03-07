@@ -38,10 +38,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
-  String podTitle ;
-  String podDescription ;
-  String podImageURL ;
+  String podTitle;
+  String podDescription;
+  String podImageURL;
 
   _getPhotoOfTheDay() {
     const podURL =
@@ -66,53 +65,54 @@ class _MyHomePageState extends State<MyHomePage> {
       imageURL = elm.attributes['src'];
     }).catchError((e) {
       throw "Could not fetch photo of the day info from smithsonianmag.com";
-    }).whenComplete((){
+    }).whenComplete(() {
       setState(() {
         podTitle = title;
         podDescription = description;
-        podImageURL =imageURL;
+        podImageURL = imageURL;
       });
     });
   }
-    _launchUrl(String url) async {
-      if (await canLaunch(url)) {
-        await launch(url);
-      } else {
-        throw 'Could not launch $url';
-      }
+
+  _launchUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Center(
-        child: podTitle != null ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              podTitle,
-              style: Theme.of(context).textTheme.display1,
-            ),
-            Text(
-              podDescription,
-            ),
-            GestureDetector(
-              onTap: () => _launchUrl('https://smithsonianmag.com'),
-              child: RichText(
-                text: new TextSpan(
-                  text: 'view on smithsonianmag.com',
-                  style: new TextStyle(color: Colors.blue),
-                ),
-              ),
-            ),
-            Image.network(
-                podImageURL)
-          ],
-        ) : Text("No photo of the day..."),
+        child: podTitle != null
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    podTitle,
+                    style: Theme.of(context).textTheme.display1,
+                  ),
+                  Text(
+                    podDescription,
+                  ),
+                  GestureDetector(
+                    onTap: () => _launchUrl('https://smithsonianmag.com'),
+                    child: RichText(
+                      text: new TextSpan(
+                        text: 'view on smithsonianmag.com',
+                        style: new TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                  Image.network(podImageURL)
+                ],
+              )
+            : Text("No photo of the day..."),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _getPhotoOfTheDay,
