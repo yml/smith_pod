@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
       ),
       home: MyHomePage(title: 'Smithsonian Photo of the day'),
     );
@@ -73,13 +73,14 @@ class _PodWidgetState extends State<PodWidget> {
   }
 
   _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    final source = "smith_pod";
+    final target = "$url?utm_source=$source";
+    if (await canLaunch(target)) {
+      await launch(target);
     } else {
-      throw 'Could not launch $url';
+      throw 'Could not launch $target';
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
