@@ -13,15 +13,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Smithsonian Photocontest',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blueGrey,
       ),
       home: MyHomePage(title: 'Smithsonian Photo of the day'),
@@ -83,35 +74,46 @@ class _PodWidgetState extends State<PodWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _getPhotoOfTheDay();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (podTitle != null) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            podTitle,
-            style: Theme.of(context).textTheme.display1,
-          ),
-          Text(
-            podDescription,
-          ),
-          GestureDetector(
-            onTap: () => _launchUrl(this.widget.url),
-            child: RichText(
-              text: new TextSpan(
-                text: 'view on smithsonianmag.com',
-                style: new TextStyle(color: Colors.blue),
+      return Card(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                podTitle,
+                style: Theme.of(context).textTheme.display1,
+                textAlign: TextAlign.left,
               ),
             ),
-          ),
-          Image.network(podImageURL)
-        ],
+            Text(
+              podDescription,
+            ),
+            GestureDetector(
+              onTap: () => _launchUrl(this.widget.url),
+              child: RichText(
+                text: new TextSpan(
+                  text: 'view on smithsonianmag.com',
+                  style: new TextStyle(color: Colors.blue),
+                ),
+              ),
+            ),
+            Image.network(podImageURL)
+          ],
+        ),
       );
     } else {
-      return FloatingActionButton(
-        onPressed: _getPhotoOfTheDay,
-        tooltip: 'Increment',
-        child: Icon(Icons.refresh),
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[CircularProgressIndicator()],
       );
     }
   }
@@ -125,16 +127,44 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List podInfoList = new List();
+
+  _fetchPodInfoList() {
+    setState(() {
+      podInfoList.add({
+        'url': 'https://www.smithsonianmag.com/photocontest/photo-of-the-day/'
+      });
+    });
+  }
+
+  Widget _buildListView() {
+    return ListView.builder(
+      itemCount: podInfoList.length,
+      itemBuilder: (context, position) {
+        print('position: $position');
+        return PodWidget(url: podInfoList[position]['url']);
+      },
+    );
+  }
+
+  List<Widget> _loadActions() {
+    return <Widget>[
+      IconButton(
+        onPressed: _fetchPodInfoList,
+        tooltip: "fetch photos",
+        icon: Icon(Icons.refresh),
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: _loadActions(),
       ),
-      body: Center(
-          child: PodWidget(
-              url:
-                  'https://www.smithsonianmag.com/photocontest/photo-of-the-day/')),
+      body: _buildListView(),
     );
   }
 }
