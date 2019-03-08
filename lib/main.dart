@@ -140,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildListView() {
     return ListView.builder(
       itemCount: podInfoList.length,
+      cacheExtent: 5000,
       itemBuilder: (context, position) {
         print('position: $position');
         return PodWidget(url: podInfoList[position]['url']);
