@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
+import 'package:cached_network_image/cached_network_image.dart';
 //import 'package:html/dom.dart' as dom;
 
 void main() => runApp(MyApp());
@@ -12,57 +13,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Smithsonian Photocontest',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
+      theme: ThemeData.dark(),
       home: MyHomePage(title: 'Smithsonian Photo of the day'),
     );
   }
 }
 
 class PodWidget extends StatefulWidget {
-  PodWidget({Key key, this.url}) : super(key: key);
-  final String url;
+  PodWidget({Key key, this.podInfo}) : super(key: key);
+  final PodInfo podInfo;
 
   @override
   _PodWidgetState createState() => _PodWidgetState();
 }
 
 class _PodWidgetState extends State<PodWidget> {
-  String podTitle;
-  String podDescription;
-  String podImageURL;
-
-  _getPhotoOfTheDay() {
-    String title;
-    String description;
-    String imageURL;
-    var response = http.get(this.widget.url);
-    response.then((resp) {
-      var document = parse(resp.body);
-      const titleSelector =
-          'body > div.container > div.photo-contest-content.photo-contest-detail-content.photo-contest-detail-wrapper > div.photo-contest-detail-title';
-      var elm = document.querySelector(titleSelector);
-      title = elm.text;
-      const descriptionSelector =
-          'body > div.container > div.photo-contest-content.photo-contest-detail-content.photo-contest-detail-wrapper > p.photo-contest-detail-caption';
-      elm = document.querySelector(descriptionSelector);
-      description = elm.text;
-      const imageUrlSelector =
-          '#hero > div.photo-contest-detail-image > div > div.slideshow-slides > div > img';
-      elm = document.querySelector(imageUrlSelector);
-      imageURL = elm.attributes['src'];
-    }).catchError((e) {
-      throw "Could not fetch photo of the day info from smithsonianmag.com";
-    }).whenComplete(() {
-      setState(() {
-        podTitle = title;
-        podDescription = description;
-        podImageURL = imageURL;
-      });
-    });
-  }
-
   _launchUrl(String url) async {
     final source = "smith_pod";
     final target = "$url?utm_source=$source";
@@ -73,47 +38,95 @@ class _PodWidgetState extends State<PodWidget> {
     }
   }
 
+  _fetchPod() async {
+    if (this.widget.podInfo.isFeched == false) {
+      (await this.widget.podInfo.fetchPodDetail());
+      setState(() {
+        print("Updating the widget after fetching pod details");
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _getPhotoOfTheDay();
+    _fetchPod();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (podTitle != null) {
+    if (this.widget.podInfo.isFeched == true) {
       return Card(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                podTitle,
-                style: Theme.of(context).textTheme.display1,
-                textAlign: TextAlign.left,
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 8.0,
               ),
-            ),
-            Text(
-              podDescription,
-            ),
-            GestureDetector(
-              onTap: () => _launchUrl(this.widget.url),
-              child: RichText(
-                text: new TextSpan(
-                  text: 'view on smithsonianmag.com',
-                  style: new TextStyle(color: Colors.blue),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  this.widget.podInfo.title,
+                  style: Theme.of(context).textTheme.display1,
+                  // textAlign: TextAlign.left,
                 ),
               ),
             ),
-            Image.network(podImageURL)
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  this.widget.podInfo.description,
+                ),
+              ),
+            ),
+            Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("by: ${this.widget.podInfo.author}"),
+                )),
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 8.0,
+                bottom: 8.0,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: GestureDetector(
+                  onTap: () => _launchUrl(this.widget.podInfo.url),
+                  child: RichText(
+                    text: new TextSpan(
+                      text: 'view on smithsonianmag.com',
+                      style: new TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            CachedNetworkImage(
+              placeholder: (context, url) => new Padding(
+                padding: const EdgeInsets.all(100),
+                child:CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => new Icon(Icons.error),
+              imageUrl: this.widget.podInfo.imageSrc,
+            )
           ],
         ),
       );
     } else {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[CircularProgressIndicator()],
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          CircularProgressIndicator(),
+          SizedBox(
+            height: 400,
+          )
+        ],
       );
     }
   }
@@ -126,24 +139,92 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+class PodInfo {
+  String url;
+  bool _isFetched;
+  String title;
+  String description;
+  String author;
+  String imageSrc;
+
+  PodInfo(this.url, this.title, this.description, this.author, this.imageSrc) {
+    this._isFetched = false;
+  }
+  PodInfo.fromUrl(this.url) {
+    this._isFetched = false;
+    this.title = null;
+    this.description = null;
+    this.author = null;
+    this.imageSrc = null;
+  }
+
+  bool get isFeched => _isFetched;
+
+  fetchPodDetail() async {
+    const String heroSelector = '#hero';
+    const String authorSelector =
+        "body > div.photo-contest-photographer-detail-section > div > div.photo-contest-photographer-name-location > div.photo-contest-detail-photographer-name > a";
+    const String imageSrcSelector =
+        "#hero > div.photo-contest-detail-image > div > div.slideshow-slides > div > img";
+    try {
+      final response = await http.get("https://www.smithsonianmag.com$url");
+      final document = parse(response.body);
+      var elm = document.querySelector(heroSelector);
+      final titleElm = elm.nextElementSibling.nextElementSibling;
+      title = titleElm.text;
+      description = titleElm.nextElementSibling.text;
+      elm = document.querySelector(authorSelector);
+      author = elm.text;
+      elm = document.querySelector(imageSrcSelector);
+      imageSrc = elm.attributes["src"];
+      _isFetched = true;
+    } catch (e) {
+      print("an error occured while getting $e");
+    }
+  }
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   List podInfoList = new List();
+  String podListURL =
+      "https://www.smithsonianmag.com/photocontest/photo-of-the-day/";
+  int currentPodPage = 1;
 
-  _fetchPodInfoList() {
+  String _buildCurrentPodURL() {
+    return "$podListURL?page=$currentPodPage";
+  }
+
+  _fetchPodInfoList() async {
+    const String podListSelector =
+        "#Page-Content > div > div.photo-contest-photos > div > div.photo-contest-photo > a";
+    var response = await http.get(_buildCurrentPodURL());
+    final document = parse(response.body);
+    final elm = document.querySelectorAll(podListSelector);
+    elm.forEach((podElm) {
+      podInfoList.add(PodInfo.fromUrl(podElm.attributes['href']));
+    });
+
+    currentPodPage++;
     setState(() {
-      podInfoList.add({
-        'url': 'https://www.smithsonianmag.com/photocontest/photo-of-the-day/'
-      });
+      print('signaling the state change');
     });
   }
 
+  @override
+  void initState(){
+    super.initState();
+    _fetchPodInfoList();
+  }
+
   Widget _buildListView() {
-    return ListView.builder(
+    return ListView.separated(
+      separatorBuilder: (context, position) {
+        return Divider(color: Colors.white);
+      },
       itemCount: podInfoList.length,
       cacheExtent: 5000,
       itemBuilder: (context, position) {
-        print('position: $position');
-        return PodWidget(url: podInfoList[position]['url']);
+        return PodWidget(podInfo: podInfoList[position]);
       },
     );
   }
