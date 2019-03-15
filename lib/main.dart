@@ -96,7 +96,7 @@ class _PodWidgetState extends State<PodWidget> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
-                  onTap: () => _launchUrl(this.widget.podInfo.url),
+                  onTap: () => _launchUrl(this.widget.podInfo.absoluteUrl),
                   child: RichText(
                     text: new TextSpan(
                       text: 'view on smithsonianmag.com',
@@ -108,9 +108,9 @@ class _PodWidgetState extends State<PodWidget> {
             ),
             CachedNetworkImage(
               placeholder: (context, url) => new Padding(
-                padding: const EdgeInsets.all(100),
-                child:CircularProgressIndicator(),
-              ),
+                    padding: const EdgeInsets.all(100),
+                    child: CircularProgressIndicator(),
+                  ),
               errorWidget: (context, url, error) => new Icon(Icons.error),
               imageUrl: this.widget.podInfo.imageSrc,
             )
@@ -158,7 +158,9 @@ class PodInfo {
     this.imageSrc = null;
   }
 
+  final String base_url = "https://smithsonianmag.com";
   bool get isFeched => _isFetched;
+  String get absoluteUrl => "$base_url$url";
 
   fetchPodDetail() async {
     const String heroSelector = '#hero';
@@ -167,7 +169,7 @@ class PodInfo {
     const String imageSrcSelector =
         "#hero > div.photo-contest-detail-image > div > div.slideshow-slides > div > img";
     try {
-      final response = await http.get("https://www.smithsonianmag.com$url");
+      final response = await http.get(absoluteUrl);
       final document = parse(response.body);
       var elm = document.querySelector(heroSelector);
       final titleElm = elm.nextElementSibling.nextElementSibling;
@@ -211,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _fetchPodInfoList();
   }

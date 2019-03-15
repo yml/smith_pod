@@ -1,7 +1,6 @@
 # smith_pod
 
-A new Flutter project.
-
+[Flutter based mobile app](https://flutter.dev) that displays the photos of the days from www.smithsonianmag.com/photocontest/
 ## Getting Started
 
 This project is a starting point for a Flutter application.
