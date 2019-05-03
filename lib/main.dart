@@ -158,9 +158,9 @@ class PodInfo {
     this.imageSrc = null;
   }
 
-  final String base_url = "https://smithsonianmag.com";
+  final String baseURL = "https://smithsonianmag.com";
   bool get isFeched => _isFetched;
-  String get absoluteUrl => "$base_url$url";
+  String get absoluteUrl => "$baseURL$url";
 
   fetchPodDetail() async {
     const String heroSelector = '#hero';
@@ -188,6 +188,8 @@ class PodInfo {
 
 class _MyHomePageState extends State<MyHomePage> {
   List podInfoList = new List();
+  ScrollController _scrollController = new ScrollController();
+  bool isPerformingRequest = false;
   String podListURL =
       "https://www.smithsonianmag.com/photocontest/photo-of-the-day/";
   int currentPodPage = 1;
@@ -197,25 +199,43 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _fetchPodInfoList() async {
-    const String podListSelector =
-        "#Page-Content > div > div.photo-contest-photos > div > div.photo-contest-photo > a";
-    var response = await http.get(_buildCurrentPodURL());
-    final document = parse(response.body);
-    final elm = document.querySelectorAll(podListSelector);
-    elm.forEach((podElm) {
-      podInfoList.add(PodInfo.fromUrl(podElm.attributes['href']));
-    });
+    if (!isPerformingRequest) {
+      setState(() {
+        isPerformingRequest = true;
+      });
+      const String podListSelector =
+          "#Page-Content > div > div.photo-contest-photos > div > div.photo-contest-photo > a";
+      var response = await http.get(_buildCurrentPodURL());
+      final document = parse(response.body);
+      final elm = document.querySelectorAll(podListSelector);
 
-    currentPodPage++;
-    setState(() {
-      print('signaling the state change');
-    });
+      currentPodPage++;
+      setState(() {
+        elm.forEach((podElm) {
+          podInfoList.add(PodInfo.fromUrl(podElm.attributes['href']));
+        });
+        isPerformingRequest = false;
+        print('signaling the state change');
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        print("fetching another page ...");
+        _fetchPodInfoList();
+      }
+    });
     _fetchPodInfoList();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Widget _buildListView() {
@@ -228,17 +248,8 @@ class _MyHomePageState extends State<MyHomePage> {
       itemBuilder: (context, position) {
         return PodWidget(podInfo: podInfoList[position]);
       },
+      controller: _scrollController,
     );
-  }
-
-  List<Widget> _loadActions() {
-    return <Widget>[
-      IconButton(
-        onPressed: _fetchPodInfoList,
-        tooltip: "fetch photos",
-        icon: Icon(Icons.refresh),
-      )
-    ];
   }
 
   @override
@@ -246,7 +257,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: _loadActions(),
       ),
       body: _buildListView(),
     );
