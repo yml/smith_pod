@@ -3,7 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:cached_network_image/cached_network_image.dart';
-//import 'package:html/dom.dart' as dom;
+import 'package:wallpaper/wallpaper.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,7 +40,7 @@ class _PodWidgetState extends State<PodWidget> {
 
   _fetchPod() async {
     if (this.widget.podInfo.isFeched == false) {
-      (await this.widget.podInfo.fetchPodDetail());
+      await this.widget.podInfo.fetchPodDetail();
       setState(() {
         print("Updating the widget after fetching pod details");
       });
@@ -113,6 +113,13 @@ class _PodWidgetState extends State<PodWidget> {
                   ),
               errorWidget: (context, url, error) => new Icon(Icons.error),
               imageUrl: this.widget.podInfo.imageSrc,
+            ),
+            RaisedButton(
+              color: Colors.blueGrey,
+              onPressed: ()async {
+                await Wallpaper.homeScreen(widget.podInfo.imageSrc);
+              },
+              child: Text("Set Wallpaper"),
             )
           ],
         ),
@@ -258,7 +265,13 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: _buildListView(),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: _buildListView()
+            ),
+        ],
+      ),
     );
   }
 }
