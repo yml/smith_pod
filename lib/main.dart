@@ -5,16 +5,15 @@ import 'package:html/parser.dart' show parse;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:wallpaper/wallpaper.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(SmithApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class SmithApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Smithsonian Photocontest',
       theme: ThemeData.dark(),
-      home: MyHomePage(title: 'Smithsonian Photo of the day'),
+      home: PodPage(title: 'Smithsonian Photo of the day'),
     );
   }
 }
@@ -139,11 +138,11 @@ class _PodWidgetState extends State<PodWidget> {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class PodPage extends StatefulWidget {
+  PodPage({Key key, this.title}) : super(key: key);
   final String title;
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _PodPageState createState() => _PodPageState();
 }
 
 class PodInfo {
@@ -193,7 +192,7 @@ class PodInfo {
   }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _PodPageState extends State<PodPage> {
   List podInfoList = new List();
   ScrollController _scrollController = new ScrollController();
   bool isPerformingRequest = false;
