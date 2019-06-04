@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/pod.dart';
 
 class PodListPage extends StatefulWidget {
-  PodListPage({Key key, this.title}) : super(key: key);
-  final String title;
+  final String title= "Smithsonian Photo of the day" ;
 
   @override
   _PodPageState createState() => _PodPageState();
@@ -70,3 +69,5 @@ class _PodPageState extends State<PodListPage> {
     );
   }
 }
+
+
