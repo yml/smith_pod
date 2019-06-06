@@ -14,9 +14,6 @@ class PodInfo {
   String author;
   String imageSrc;
 
-  PodInfo(this.url, this.title, this.description, this.author, this.imageSrc) {
-    this._isFetched = false;
-  }
   PodInfo.fromUrl(this.url) {
     this._isFetched = false;
     this.title = null;
@@ -29,26 +26,28 @@ class PodInfo {
   bool get isFeched => _isFetched;
   String get absoluteUrl => "$baseURL$url";
 
-  fetchPodDetail() async {
+  fetchDetail() async {
     const String heroSelector = '#hero';
     const String authorSelector =
         "body > div.photo-contest-photographer-detail-section > div > div.photo-contest-photographer-name-location > div.photo-contest-detail-photographer-name > a";
     const String imageSrcSelector =
         "#hero > div.photo-contest-detail-image > div > div.slideshow-slides > div > img";
-    try {
-      final response = await http.get(absoluteUrl);
-      final document = parse(response.body);
-      var elm = document.querySelector(heroSelector);
-      final titleElm = elm.nextElementSibling.nextElementSibling;
-      title = titleElm.text;
-      description = titleElm.nextElementSibling.text;
-      elm = document.querySelector(authorSelector);
-      author = elm.text;
-      elm = document.querySelector(imageSrcSelector);
-      imageSrc = elm.attributes["src"];
-      _isFetched = true;
-    } catch (e) {
-      print("an error occured while getting $e");
+    if (!_isFetched) {
+      try {
+        final response = await http.get(absoluteUrl);
+        final document = parse(response.body);
+        var elm = document.querySelector(heroSelector);
+        final titleElm = elm.nextElementSibling.nextElementSibling;
+        title = titleElm.text;
+        description = titleElm.nextElementSibling.text;
+        elm = document.querySelector(authorSelector);
+        author = elm.text;
+        elm = document.querySelector(imageSrcSelector);
+        imageSrc = elm.attributes["src"];
+        _isFetched = true;
+      } catch (e) {
+        print("an error occured while getting $e");
+      }
     }
   }
 }
@@ -105,11 +104,13 @@ class _PodWidgetState extends State<PodWidget> {
   }
 
   _fetchPod() async {
-    if (this.widget.podInfo.isFeched == false) {
-      await this.widget.podInfo.fetchPodDetail();
-      setState(() {
-        print("Updating the widget after fetching pod details");
-      });
+    if (widget.podInfo.isFeched == false) {
+      await widget.podInfo.fetchDetail();
+      if (this.mounted) {
+        setState(() {
+          print("Updating the widget after fetching pod details");
+        });
+      }
     }
   }
 
@@ -121,10 +122,9 @@ class _PodWidgetState extends State<PodWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (this.widget.podInfo.isFeched == true) {
+    if (widget.podInfo.isFeched == true) {
       return Card(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(
@@ -133,7 +133,7 @@ class _PodWidgetState extends State<PodWidget> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  this.widget.podInfo.title,
+                  widget.podInfo.title,
                   style: Theme.of(context).textTheme.display1,
                   // textAlign: TextAlign.left,
                 ),
@@ -144,7 +144,7 @@ class _PodWidgetState extends State<PodWidget> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  this.widget.podInfo.description,
+                  widget.podInfo.description,
                 ),
               ),
             ),
@@ -152,7 +152,7 @@ class _PodWidgetState extends State<PodWidget> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("by: ${this.widget.podInfo.author}"),
+                  child: Text("by: ${widget.podInfo.author}"),
                 )),
             Padding(
               padding: const EdgeInsets.only(
@@ -162,7 +162,7 @@ class _PodWidgetState extends State<PodWidget> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
-                  onTap: () => _launchUrl(this.widget.podInfo.absoluteUrl),
+                  onTap: () => _launchUrl(widget.podInfo.absoluteUrl),
                   child: RichText(
                     text: new TextSpan(
                       text: 'view on smithsonianmag.com',
@@ -178,7 +178,7 @@ class _PodWidgetState extends State<PodWidget> {
                     child: CircularProgressIndicator(),
                   ),
               errorWidget: (context, url, error) => new Icon(Icons.error),
-              imageUrl: this.widget.podInfo.imageSrc,
+              imageUrl: widget.podInfo.imageSrc,
             ),
             RaisedButton(
               color: Colors.blueGrey,

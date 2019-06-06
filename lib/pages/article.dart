@@ -1,33 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:smith_pod/widgets/article.dart';
 
-import '../widgets/pod.dart';
+class ArticleListPage extends StatefulWidget {
+  ArticleListPage({Key key, @required this.section}) : super(key: key);
+  final String section;
 
-class PodListPage extends StatefulWidget {
-  final String title = "Smithsonian Photo of the day";
-
-  @override
-  _PodListPageState createState() => _PodListPageState();
-}
-
-class _PodListPageState extends State<PodListPage> {
-  List podInfoList = new List();
-  ScrollController _scrollController = new ScrollController();
-  PodFetcher podFetcher = new PodFetcher();
-
-  fetchMore() async {
-    List pods = await podFetcher.fetch();
-    if (this.mounted) {
-      setState(() {
-        pods.forEach((podElm) {
-          podInfoList.add(podElm);
-        });
-      });
-    }
+  get title {
+    return "$section articles";
   }
 
   @override
-  void initState() {
+  _ArticlePageListState createState() => _ArticlePageListState();
+}
+
+class _ArticlePageListState extends State<ArticleListPage> {
+  List articleList = new List();
+  ScrollController _scrollController = new ScrollController();
+  ArticleFetcherByCategory articlesFetcher;
+
+  fetchMore() async {
+    List articles = await articlesFetcher.fetch();
+    if (this.mounted) {
+      setState(() {
+        articles.forEach((articleElm) {
+          articleList.add(articleElm);
+        });
+      });
+    }
+    print(articles);
+  }
+
+  @override
+  initState() {
     super.initState();
+    articlesFetcher = new ArticleFetcherByCategory(widget.section);
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -43,10 +49,10 @@ class _PodListPageState extends State<PodListPage> {
       separatorBuilder: (context, position) {
         return Divider(color: Colors.white);
       },
-      itemCount: podInfoList.length,
+      itemCount: articleList.length,
       cacheExtent: 5000,
       itemBuilder: (context, position) {
-        return PodWidget(podInfo: podInfoList[position]);
+        return ArticleWidget(articleInfo: articleList[position]);
       },
       controller: _scrollController,
     );
