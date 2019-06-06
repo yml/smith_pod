@@ -119,7 +119,7 @@ class ArticleWidget extends StatelessWidget {
           Row(
             children: <Widget>[
               Container(
-                width: 150,
+                width: 200,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CachedNetworkImage(
@@ -132,8 +132,7 @@ class ArticleWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              Expanded(
                 child: Container(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -146,11 +145,14 @@ class ArticleWidget extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () => _launchUrl(articleInfo.absoluteUrl),
-                        child: RichText(
-                          softWrap: true,
-                          text: new TextSpan(
-                            text: 'view on smithsonianmag.com',
-                            style: new TextStyle(color: Colors.blue),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: RichText(
+                            softWrap: true,
+                            text: new TextSpan(
+                              text: 'view on smithsonianmag.com',
+                              style: new TextStyle(color: Colors.blue),
+                            ),
                           ),
                         ),
                       ),
