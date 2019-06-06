@@ -120,6 +120,7 @@ class ArticleWidget extends StatelessWidget {
             children: <Widget>[
               Container(
                 width: 200,
+                height: 150,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CachedNetworkImage(
@@ -133,31 +134,29 @@ class ArticleWidget extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          articleInfo.byLine,
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        articleInfo.byLine,
                       ),
-                      GestureDetector(
-                        onTap: () => _launchUrl(articleInfo.absoluteUrl),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: RichText(
-                            softWrap: true,
-                            text: new TextSpan(
-                              text: 'view on smithsonianmag.com',
-                              style: new TextStyle(color: Colors.blue),
-                            ),
+                    ),
+                    GestureDetector(
+                      onTap: () => _launchUrl(articleInfo.absoluteUrl),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: RichText(
+                          softWrap: true,
+                          text: new TextSpan(
+                            text: 'view on smithsonianmag.com',
+                            style: new TextStyle(color: Colors.blue),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               )
             ],
