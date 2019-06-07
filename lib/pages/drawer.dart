@@ -18,8 +18,10 @@ class SmithDrawer extends StatelessWidget {
               Navigator.push(
                   ctx,
                   new MaterialPageRoute(
-                      builder: (ctx) =>
-                          new ArticleListPage(section: "Smart News")));
+                      builder: (ctx) => new ArticleListPage(
+                            section: "Smart News",
+                            appDrawer: SmithDrawer(),
+                          )));
             },
           ),
           new ListTile(
@@ -29,8 +31,10 @@ class SmithDrawer extends StatelessWidget {
               Navigator.push(
                   ctx,
                   new MaterialPageRoute(
-                      builder: (ctx) =>
-                          new ArticleListPage(section: "History")));
+                      builder: (ctx) => new ArticleListPage(
+                            section: "History",
+                            appDrawer: SmithDrawer(),
+                          )));
             },
           ),
           new ListTile(
@@ -40,8 +44,10 @@ class SmithDrawer extends StatelessWidget {
               Navigator.push(
                   ctx,
                   new MaterialPageRoute(
-                      builder: (ctx) =>
-                          new ArticleListPage(section: "Innovation")));
+                      builder: (ctx) => new ArticleListPage(
+                            section: "Innovation",
+                            appDrawer: SmithDrawer(),
+                          )));
             },
           ),
           new ListTile(
@@ -51,8 +57,10 @@ class SmithDrawer extends StatelessWidget {
               Navigator.push(
                   ctx,
                   new MaterialPageRoute(
-                      builder: (ctx) =>
-                          new ArticleListPage(section: "Science")));
+                      builder: (ctx) => new ArticleListPage(
+                            section: "Science",
+                            appDrawer: SmithDrawer(),
+                          )));
             },
           ),
           new ListTile(
@@ -60,7 +68,7 @@ class SmithDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(ctx);
               Navigator.push(ctx,
-                  new MaterialPageRoute(builder: (ctx) => new PodListPage()));
+                  new MaterialPageRoute(builder: (ctx) => new PodListPage(appDrawer: SmithDrawer(),)));
             },
           ),
         ],

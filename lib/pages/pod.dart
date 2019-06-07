@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../widgets/pod.dart';
 
 class PodListPage extends StatefulWidget {
+  PodListPage({Key key, @required this.appDrawer}): super(key: key);
+  final Widget appDrawer;
   final String title = "Smithsonian Photo of the day";
 
   @override
@@ -55,6 +57,7 @@ class _PodListPageState extends State<PodListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: widget.appDrawer,
       appBar: AppBar(
         title: Text(widget.title),
       ),

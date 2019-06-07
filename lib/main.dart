@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smith_pod/pages/drawer.dart';
 
 import 'pages/pod.dart';
-import 'pages/drawer.dart';
 
 void main() => runApp(SmithApp());
 
@@ -20,13 +20,7 @@ class SmithApp extends StatelessWidget {
 class SmithDrawerApp extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
-    return new Scaffold(
-      drawer: new SmithDrawer(),
-      appBar: new AppBar(
-        title: new Text("Smithsonian Magazine"),
-      ),
-      body: PodListPage(),
-    );
+    return PodListPage(appDrawer: SmithDrawer(),)
   }
 }
 

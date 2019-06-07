@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smith_pod/widgets/article.dart';
 
 class ArticleListPage extends StatefulWidget {
-  ArticleListPage({Key key, @required this.section}) : super(key: key);
+  ArticleListPage({Key key, @required this.section, @required this.appDrawer}) : super(key: key);
+  final Widget appDrawer;
   final String section;
 
   get title {
@@ -61,6 +62,7 @@ class _ArticlePageListState extends State<ArticleListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: widget.appDrawer,
       appBar: AppBar(
         title: Text(widget.title),
       ),
