@@ -20,7 +20,7 @@ class SmithApp extends StatelessWidget {
 class SmithDrawerApp extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
-    return PodListPage(appDrawer: SmithDrawer(),)
+    return PodListPage(appDrawer: SmithDrawer(),);
   }
 }
 

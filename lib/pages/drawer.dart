@@ -5,70 +5,89 @@ import 'article.dart';
 class SmithDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
-    return new Drawer(
-      child: new ListView(
+    return Drawer(
+      child: ListView(
         children: <Widget>[
-          new DrawerHeader(
-            child: new Text("Smithsonian Magazine"),
+          DrawerHeader(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text("Smithsonian Magazine"),
+                Image.asset(
+                  "assets/smith_sun_no_bg.png",
+                  width: 100,
+                  height: 100,
+                )
+              ],
+            ),
           ),
-          new ListTile(
-            title: new Text("Smart News"),
+          ListTile(
+            leading: Icon(Icons.art_track),
+            title: Text("Smart News"),
             onTap: () {
               Navigator.pop(ctx);
               Navigator.push(
                   ctx,
-                  new MaterialPageRoute(
-                      builder: (ctx) => new ArticleListPage(
+                  MaterialPageRoute(
+                      builder: (ctx) => ArticleListPage(
                             section: "Smart News",
                             appDrawer: SmithDrawer(),
                           )));
             },
           ),
-          new ListTile(
-            title: new Text("History"),
+          ListTile(
+            leading: Icon(Icons.art_track),
+            title: Text("History"),
             onTap: () {
               Navigator.pop(ctx);
               Navigator.push(
                   ctx,
-                  new MaterialPageRoute(
-                      builder: (ctx) => new ArticleListPage(
+                  MaterialPageRoute(
+                      builder: (ctx) => ArticleListPage(
                             section: "History",
                             appDrawer: SmithDrawer(),
                           )));
             },
           ),
-          new ListTile(
-            title: new Text("Innovation"),
+          ListTile(
+            leading: Icon(Icons.art_track),
+            title: Text("Innovation"),
             onTap: () {
               Navigator.pop(ctx);
               Navigator.push(
                   ctx,
-                  new MaterialPageRoute(
-                      builder: (ctx) => new ArticleListPage(
+                  MaterialPageRoute(
+                      builder: (ctx) => ArticleListPage(
                             section: "Innovation",
                             appDrawer: SmithDrawer(),
                           )));
             },
           ),
-          new ListTile(
-            title: new Text("Science"),
+          ListTile(
+            leading: Icon(Icons.art_track),
+            title: Text("Science"),
             onTap: () {
               Navigator.pop(ctx);
               Navigator.push(
                   ctx,
-                  new MaterialPageRoute(
-                      builder: (ctx) => new ArticleListPage(
+                  MaterialPageRoute(
+                      builder: (ctx) => ArticleListPage(
                             section: "Science",
                             appDrawer: SmithDrawer(),
                           )));
             },
           ),
-          new ListTile(
-            title: new Text("Photos of the day"),
+          ListTile(
+            leading: Icon(Icons.photo_camera),
+            title: Text("Photos of the day"),
             onTap: () {
               Navigator.pop(ctx);
-              Navigator.push(ctx,
-                  new MaterialPageRoute(builder: (ctx) => new PodListPage(appDrawer: SmithDrawer(),)));
+              Navigator.push(
+                  ctx,
+                  MaterialPageRoute(
+                      builder: (ctx) => PodListPage(
+                            appDrawer: SmithDrawer(),
+                          )));
             },
           ),
         ],

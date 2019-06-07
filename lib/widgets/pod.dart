@@ -185,7 +185,16 @@ class _PodWidgetState extends State<PodWidget> {
               onPressed: () async {
                 await Wallpaper.homeScreen(widget.podInfo.imageSrc);
               },
-              child: Text("Set Wallpaper"),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.wallpaper),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("Set Wallpaper"),
+                  ),
+                ],
+              ),
             )
           ],
         ),
