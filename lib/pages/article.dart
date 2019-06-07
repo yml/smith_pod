@@ -21,14 +21,13 @@ class _ArticlePageListState extends State<ArticleListPage> {
 
   fetchMore() async {
     List articles = await articlesFetcher.fetch();
-    if (this.mounted) {
+    if (this.mounted && articles.length > 0) {
       setState(() {
         articles.forEach((articleElm) {
           articleList.add(articleElm);
         });
       });
     }
-    print(articles);
   }
 
   @override
@@ -36,9 +35,10 @@ class _ArticlePageListState extends State<ArticleListPage> {
     super.initState();
     articlesFetcher = new ArticleFetcherByCategory(widget.section);
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 500) {
         print("fetching another page ...");
+        print ("maxScrollExtent : ${_scrollController.position.maxScrollExtent}" );
         fetchMore();
       }
     });

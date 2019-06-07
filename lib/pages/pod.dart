@@ -18,7 +18,7 @@ class _PodListPageState extends State<PodListPage> {
 
   fetchMore() async {
     List pods = await podFetcher.fetch();
-    if (this.mounted) {
+    if (this.mounted && pods.length > 0) {
       setState(() {
         pods.forEach((podElm) {
           podInfoList.add(podElm);
@@ -31,9 +31,10 @@ class _PodListPageState extends State<PodListPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 1000) {
         print("fetching another page ...");
+        print ("maxScrollExtent : ${_scrollController.position.maxScrollExtent}" );
         fetchMore();
       }
     });

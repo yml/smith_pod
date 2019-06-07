@@ -65,9 +65,11 @@ class PodFetcher {
   }
 
   Future<List<PodInfo>> fetch() async {
-    List pods = new List<PodInfo>();
+    List pods = List<PodInfo>();
     if (!isPerformingRequest) {
       isPerformingRequest = true;
+    } else {
+      return List();
     }
     var response = await http.get(_buildCurrentPodURL());
     final document = parse(response.body);
@@ -164,20 +166,20 @@ class _PodWidgetState extends State<PodWidget> {
                 child: GestureDetector(
                   onTap: () => _launchUrl(widget.podInfo.absoluteUrl),
                   child: RichText(
-                    text: new TextSpan(
+                    text: TextSpan(
                       text: 'view on smithsonianmag.com',
-                      style: new TextStyle(color: Colors.blue),
+                      style: TextStyle(color: Colors.blue),
                     ),
                   ),
                 ),
               ),
             ),
             CachedNetworkImage(
-              placeholder: (context, url) => new Padding(
+              placeholder: (context, url) => Padding(
                     padding: const EdgeInsets.all(100),
                     child: CircularProgressIndicator(),
                   ),
-              errorWidget: (context, url, error) => new Icon(Icons.error),
+              errorWidget: (context, url, error) => Icon(Icons.error),
               imageUrl: widget.podInfo.imageSrc,
             ),
             RaisedButton(

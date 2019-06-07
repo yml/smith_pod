@@ -50,7 +50,9 @@ class ArticleFetcherByCategory {
     List articles = new List<ArticleInfo>();
     if (!isPerformingRequest) {
       isPerformingRequest = true;
-    }
+    } else {
+      return List();
+    };
 
     var response = await http.get(currentSearchURL());
     final document = parse(response.body);
