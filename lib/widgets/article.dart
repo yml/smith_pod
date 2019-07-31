@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:smith_pod/pages/article.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:html/parser.dart' show parse;
@@ -91,16 +91,6 @@ class ArticleWidget extends StatelessWidget {
 
   ArticleWidget({Key key, this.articleInfo}) : super(key: key);
 
-  _launchUrl(String url) async {
-    final source = "smith_pod";
-    final target = "$url?utm_source=$source";
-    if (await canLaunch(target)) {
-      await launch(target);
-    } else {
-      throw 'Could not launch $target';
-    }
-  }
-
   @override
   Widget build(BuildContext ctx) {
     return Card(
@@ -127,9 +117,9 @@ class ArticleWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: CachedNetworkImage(
                     placeholder: (context, url) => new Padding(
-                          padding: const EdgeInsets.all(100),
-                          child: CircularProgressIndicator(),
-                        ),
+                      padding: const EdgeInsets.all(100),
+                      child: CircularProgressIndicator(),
+                    ),
                     errorWidget: (context, url, error) => new Icon(Icons.error),
                     imageUrl: articleInfo.imageSrc,
                   ),
@@ -146,7 +136,15 @@ class ArticleWidget extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => _launchUrl(articleInfo.absoluteUrl),
+                      onTap: () {
+                        print("there is a tap!!!");
+                        Widget articleDetailPage = ArticleDetailPage(url: this.articleInfo.absoluteUrl);
+                        Navigator.push(
+                            ctx,
+                            MaterialPageRoute(
+                                builder: (ctx) => articleDetailPage),
+                        );
+                      },
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: RichText(

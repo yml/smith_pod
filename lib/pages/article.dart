@@ -1,5 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:smith_pod/widgets/article.dart';
+
+import 'dart:async';
+
+
+class ArticleDetailPage extends StatefulWidget {
+  ArticleDetailPage({Key key, @required this.url}): super(key: key);
+  final String url;
+
+  @override
+  _ArticleDetailPageState createState() => _ArticleDetailPageState();
+}
+
+class _ArticleDetailPageState extends State<ArticleDetailPage> {
+   Completer<WebViewController> _controller = Completer<WebViewController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Article Detail Page ${widget.url}"),
+      ),
+      body: WebView(
+            initialUrl: widget.url,
+            javascriptMode: JavascriptMode.unrestricted,
+            onWebViewCreated: (WebViewController webViewController) {
+              _controller.complete(webViewController);
+            },
+        ),
+      );
+  }
+
+}
+
 
 class ArticleListPage extends StatefulWidget {
   ArticleListPage({Key key, @required this.section, @required this.appDrawer}) : super(key: key);
