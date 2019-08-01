@@ -1,6 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../widgets/pod.dart';
+
+import "dart:async";
+
+class PodDetailPage extends StatefulWidget {
+  PodDetailPage({Key key, @required this.url}): super(key: key);
+  final String url;
+
+  @override
+  _PodDetailPageState createState() => _PodDetailPageState();
+}
+
+class _PodDetailPageState extends State<PodDetailPage> {
+   Completer<WebViewController> _controller = Completer<WebViewController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Photocontest Detail Page ${widget.url}"),
+      ),
+      body: WebView(
+            initialUrl: widget.url,
+            javascriptMode: JavascriptMode.unrestricted,
+            onWebViewCreated: (WebViewController webViewController) {
+              _controller.complete(webViewController);
+            },
+        ),
+      );
+  }
+}
 
 class PodListPage extends StatefulWidget {
   PodListPage({Key key, @required this.appDrawer}): super(key: key);

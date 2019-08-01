@@ -31,7 +31,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
         ),
       );
   }
-
 }
 
 

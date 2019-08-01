@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:wallpaper/wallpaper.dart';
-
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
+
+import 'package:smith_pod/pages/pod.dart';
 
 class PodInfo {
   String url;
@@ -24,7 +24,7 @@ class PodInfo {
 
   final String baseURL = "https://smithsonianmag.com";
   bool get isFeched => _isFetched;
-  String get absoluteUrl => "$baseURL$url";
+  String get absoluteUrl => "$baseURL$url?utm=mobileApp";
 
   fetchDetail() async {
     const String heroSelector = '#hero';
@@ -95,16 +95,6 @@ class PodWidget extends StatefulWidget {
 }
 
 class _PodWidgetState extends State<PodWidget> {
-  _launchUrl(String url) async {
-    final source = "smith_pod";
-    final target = "$url?utm_source=$source";
-    if (await canLaunch(target)) {
-      await launch(target);
-    } else {
-      throw 'Could not launch $target';
-    }
-  }
-
   _fetchPod() async {
     if (widget.podInfo.isFeched == false) {
       await widget.podInfo.fetchDetail();
@@ -126,79 +116,76 @@ class _PodWidgetState extends State<PodWidget> {
   Widget build(BuildContext context) {
     if (widget.podInfo.isFeched == true) {
       return Card(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 8.0,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.podInfo.title,
-                  style: Theme.of(context).textTheme.display1,
-                  // textAlign: TextAlign.left,
+        child: GestureDetector(
+          onTap: () {
+            Widget podDetailPage =
+                PodDetailPage(url: widget.podInfo.absoluteUrl);
+            print("this is a tap in the card");
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (ctx) => podDetailPage),
+            );
+          },
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 8.0,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.podInfo.title,
+                    style: Theme.of(context).textTheme.display1,
+                    // textAlign: TextAlign.left,
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.podInfo.description,
-                ),
-              ),
-            ),
-            Padding(
+              Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("by: ${widget.podInfo.author}"),
-                )),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 8.0,
-                bottom: 8.0,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () => _launchUrl(widget.podInfo.absoluteUrl),
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'view on smithsonianmag.com',
-                      style: TextStyle(color: Colors.blue),
-                    ),
+                  child: Text(
+                    widget.podInfo.description,
                   ),
                 ),
               ),
-            ),
-            CachedNetworkImage(
-              placeholder: (context, url) => Padding(
-                    padding: const EdgeInsets.all(100),
-                    child: CircularProgressIndicator(),
-                  ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-              imageUrl: widget.podInfo.imageSrc,
-            ),
-            RaisedButton(
-              color: Colors.blueGrey,
-              onPressed: () async {
-                await Wallpaper.homeScreen(widget.podInfo.imageSrc);
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(Icons.wallpaper),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text("Set Wallpaper"),
-                  ),
-                ],
+              Padding(
+                  padding: const EdgeInsets.only(
+                    left: 8.0,
+                    top: 8.0,
+                    bottom: 8.0
+                    ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("by: ${widget.podInfo.author}"),
+                  )),
+              CachedNetworkImage(
+                placeholder: (context, url) => Padding(
+                  padding: EdgeInsets.only(top:8.0),
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+                imageUrl: widget.podInfo.imageSrc,
               ),
-            )
-          ],
+              RaisedButton(
+                color: Colors.blueGrey,
+                onPressed: () async {
+                  await Wallpaper.homeScreen(widget.podInfo.imageSrc);
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(Icons.wallpaper),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Set Wallpaper"),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       );
     } else {

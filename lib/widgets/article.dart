@@ -27,7 +27,7 @@ class ArticleInfo {
   final String searchURL = "https://smithsonianmag.com/search/?categories=";
   final String baseURL = "https://smithsonianmag.com";
 
-  String get absoluteUrl => "$baseURL$url";
+  String get absoluteUrl => "$baseURL$url?utm=mobileApp";
   bool get isFeched => _isFetched;
 }
 
@@ -94,74 +94,64 @@ class ArticleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
     return Card(
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                articleInfo.title,
-                softWrap: true,
-                style:
-                    DefaultTextStyle.of(ctx).style.apply(fontSizeFactor: 1.4),
+      child: GestureDetector(
+        onTap: () {
+          Widget articleDetailPage =
+              ArticleDetailPage(url: this.articleInfo.absoluteUrl);
+          Navigator.push(
+            ctx,
+            MaterialPageRoute(builder: (ctx) => articleDetailPage),
+          );
+        },
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  articleInfo.title,
+                  softWrap: true,
+                  style:
+                      DefaultTextStyle.of(ctx).style.apply(fontSizeFactor: 1.4),
+                ),
               ),
             ),
-          ),
-          Row(
-            children: <Widget>[
-              Container(
-                width: 200,
-                height: 150,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CachedNetworkImage(
-                    placeholder: (context, url) => new Padding(
-                      padding: const EdgeInsets.all(100),
-                      child: CircularProgressIndicator(),
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 200,
+                  height: 150,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) => new Padding(
+                        padding: const EdgeInsets.all(100),
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          new Icon(Icons.error),
+                      imageUrl: articleInfo.imageSrc,
                     ),
-                    errorWidget: (context, url, error) => new Icon(Icons.error),
-                    imageUrl: articleInfo.imageSrc,
                   ),
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        articleInfo.byLine,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        print("there is a tap!!!");
-                        Widget articleDetailPage = ArticleDetailPage(url: this.articleInfo.absoluteUrl);
-                        Navigator.push(
-                            ctx,
-                            MaterialPageRoute(
-                                builder: (ctx) => articleDetailPage),
-                        );
-                      },
-                      child: Align(
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Align(
                         alignment: Alignment.centerLeft,
-                        child: RichText(
-                          softWrap: true,
-                          text: new TextSpan(
-                            text: 'view on smithsonianmag.com',
-                            style: new TextStyle(color: Colors.blue),
-                          ),
+                        child: Text(
+                          "by : ${articleInfo.byLine}",
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ],
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
