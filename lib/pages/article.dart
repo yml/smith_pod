@@ -29,6 +29,24 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
               _controller.complete(webViewController);
             },
         ),
+      persistentFooterButtons: <Widget>[
+        FloatingActionButton.extended(
+          onPressed: () {
+            print("Previous article");
+          },
+          label: Text("previous"),
+          icon: Icon(Icons.arrow_back),
+          backgroundColor: Colors.lightBlue,
+        ),
+        FloatingActionButton.extended(
+          onPressed: () {
+            print("Next article");
+          },
+          label: Text("next"),
+          icon: Icon(Icons.arrow_forward),
+          backgroundColor: Colors.lightBlue,
+        )
+      ],
       );
   }
 }
